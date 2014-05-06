@@ -14,7 +14,7 @@ HELP()
 {
 	echo "sh vlc.sh server/client [rtsp/rtp/udp/http/darwin/apache]"
 }
-if [ $role = "server " ];then
+if [ $role = "server" ];then
 	# server
 	if [ $option = "rtsp" ];then
 		#RTSP
@@ -57,4 +57,6 @@ elif [ $role = "client" ];then
 	else
 		vlc http://$dst_ip:$vlc_port --network-caching=300
 	fi
+else
+	HELP
 fi
