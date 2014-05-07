@@ -8,12 +8,16 @@ apache_port=9090
 vlc_port=8989
 
 role=$1
-option=$2
-
+option=
 HELP()
 {
 	echo "sh vlc.sh server/client [rtsp/rtp/udp/http/darwin/apache]"
 }
+
+if [ $# -ge 2 ];then
+	option=$2
+fi
+
 if [ $role = "server" ];then
 	# server
 	if [ $option = "rtsp" ];then
