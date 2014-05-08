@@ -71,7 +71,7 @@ if [ $role = "server" ];then
 		vlc -vvv qqq.avi --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{dst=$ip_dst,port=$vlc_port,mux=ts,ttl=10}"
 	elif [ $option = "http" ];then
 		#HTTP
-		vlc -vvv qqq.avi --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:http{mux=ffmpeg{mux=flv},dst=:$vlc_port/test}"
+		vlc -vvv aaa.mp4 --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:http{mux=ffmpeg{mux=flv},dst=:$vlc_port/test}"
 	elif [ $option = "audio" ];then
 		#AUDIO
 		vlc -vvv mmm.mp3 --sout "#standard{access=http,mux=ogg,dst=$ip_src:$vlc_port}"
