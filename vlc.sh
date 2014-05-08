@@ -13,7 +13,7 @@ option="NULL"
 
 HELP()
 {
-	echo "sh vlc.sh server/client [rtsp/rtp/udp/http/darwin/apache]"
+	echo "sh vlc.sh server/client/mount [rtsp/rtp/udp/http/darwin/apache]"
 }
 
 FIND_PEER()
@@ -101,6 +101,8 @@ elif [ $role = "client" ];then
 	else
 		vlc http://$ip_dst:$vlc_port --network-caching=300
 	fi
+elif [ $role = "mount" ];then
+    sshfs xumin@$ip_dst:/home/xumin/www /home/xumin/www
 else
 	HELP
 fi
