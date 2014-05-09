@@ -7,6 +7,8 @@ mac_1="3c:97:0e:11:3a:48"
 darwin_rtsp_port=7070
 apache_port=9090
 vlc_port=8989
+remote_path=/home/xumin/www
+local_path=/home/xumin/www
 
 role="NULL"
 option="NULL"
@@ -62,21 +64,21 @@ if [ $role = "server" ];then
 	# server
 	if [ $option = "rtsp" ];then
 		#RTSP
-		vlc -vvv  qqq.avi --sout "#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{sdp=rtsp://:$vlc_port/test}"
+		vlc -vvv $local_path/qqq.avi --sout "#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{sdp=rtsp://:$vlc_port/test}"
 	elif [ $option = "udp" ];then
 		#UDP
-		vlc -vvv qqq.avi --sout  "#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=udp{ttl=10},mux=ts,dst=$ip_dst:$vlc_port}"
+		vlc -vvv $local_path/qqq.avi --sout  "#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=udp{ttl=10},mux=ts,dst=$ip_dst:$vlc_port}"
 	elif [ $option = "rtp" ];then
 		#RTP
-		vlc -vvv qqq.avi --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{dst=$ip_dst,port=$vlc_port,mux=ts,ttl=10}"
+		vlc -vvv $local_path/qqq.avi --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{dst=$ip_dst,port=$vlc_port,mux=ts,ttl=10}"
 	elif [ $option = "http" ];then
 		#HTTP
-		vlc -vvv aaa.mp4 --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:http{mux=ffmpeg{mux=flv},dst=:$vlc_port/test}"
+		vlc -vvv $local_path/aaa.mp4 --sout "#transcode{vcodec=h264,vb=0,scale=0,acodec=mpga,ab=128,channels=2,samplerate=44100}:http{mux=ffmpeg{mux=flv},dst=:$vlc_port/test}"
 	elif [ $option = "audio" ];then
 		#AUDIO
-		vlc -vvv mmm.mp3 --sout "#standard{access=http,mux=ogg,dst=$ip_src:$vlc_port}"
+		vlc -vvv $local_path/mmm.mp3 --sout "#standard{access=http,mux=ogg,dst=$ip_src:$vlc_port}"
 	else
-		vlc -vvv ddd.mp4 --sout "#transcode{vcodec=mp4v,acodec=mpga,vb=800,ab=128}:standard{access=http,mux=ogg,dst=$ip_src:$vlc_port}"
+		vlc -vvv $local_path/ddd.mp4 --sout "#transcode{vcodec=mp4v,acodec=mpga,vb=800,ab=128}:standard{access=http,mux=ogg,dst=$ip_src:$vlc_port}"
 	fi
 elif [ $role = "client" ];then
 	#client
@@ -102,7 +104,7 @@ elif [ $role = "client" ];then
 		vlc http://$ip_dst:$vlc_port --network-caching=300
 	fi
 elif [ $role = "mount" ];then
-    sshfs xumin@$ip_dst:/home/xumin/www /home/xumin/www
+    sshfs xumin@$ip_dst:$local_path $remote_path
 else
 	HELP
 fi
