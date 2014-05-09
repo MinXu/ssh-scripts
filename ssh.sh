@@ -3,7 +3,8 @@
 
 USR_NAME="xumin"
 
-remote_ip="10.80.104.125"
+#remote_ip="10.80.104.125"
+remote_ip="xumin-thinkpad-t520"
 remote_path="/home/$USR_NAME/tcp/nc"
 local_path="/home/$USR_NAME/tcp_source/nc"
 remote_vod_path="/home/$USR_NAME/www"
