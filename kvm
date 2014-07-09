@@ -1,0 +1,98 @@
+1. 用下面的命令检查cpu是否支持虚拟化,什么都不显示的话，就不能玩了。还好，我可以继续了。
+	egrep '(vmx|svm)' --color=always /proc/cpuinfo
+
+2. 安装
+	apt-get install ubuntu-virt-server python-vm-builder kvm-ipxe  
+
+3. 将当前用户加入到kvm和libvirtd组
+	adduser `id -un` libvirtd  
+	adduser `id -un` kvm  
+
+4。 运行下面的命令检查kvm是否安装成功。
+	root@kvmhost:~# virsh -c qemu:///system list  
+	 Id Name                 State  
+	----------------------------------  
+	没有错误信息。安装没问题。
+
+5. 可能需要安装bridge-utils
+	apt-get install bridge-utils  
+
+
+6. 编辑/etc/network/interface文件，编辑前我的文件如下：
+	# This file describes the network interfaces available on your system  
+	# and how to activate them. For more information, see interfaces(5).  
+	  
+	# The loopback network interface  
+	auto lo  
+	iface lo inet loopback  
+	  
+	# The primary network interface  
+	auto eth0  
+	iface eth0 inet dhcp  
+	修改为：
+	# This file describes the network interfaces available on your system  
+	# and how to activate them. For more information, see interfaces(5).  
+	  
+	# The loopback network interface  
+	auto lo  
+	iface lo inet loopback  
+	  
+	# The primary network interface (disable)  
+	#auto eth0  
+	#iface eth0 inet dhcp  
+	  
+	# The primary network interface for kvm  
+	auto eth0  
+	iface eth0 inet manual  
+	  
+	  
+	auto br0  
+	iface br0 inet static  
+	    address 10.112.18.177  
+	    network 10.112.18.0  
+	    netmask 255.255.255.0  
+	    broadcast 10.112.18.255  
+	    gateway 10.112.18.1  
+	    dns-nameservers 8.8.8.8 8.8.4.4  
+	    bridge_ports eth0  
+	    bridge_fd 9  
+	    bridge_hello 2  
+	    bridge_maxage 12  
+	    bridge_stp off  
+7. 重新启动网络服务
+	/etc/init.d/networking restart
+
+===========================================================================================================================
+8. 创建虚拟镜像 (由于是要安装xp精简系统，2G已经足够大了（安装下来只要700M）。xxx 代表名字，想取什么都可以。最好是连续的英文.默认格式为raw，当然你可以自己设定，比如（-f qcow2）加在 create 后面即可。（.img这个后缀是我随便编的，kvm对后缀名没有要求） 其它格式如下：)
+	kvm-img create xxx.img 2G
+
+9. 安装虚拟机系统 (说明几点：/path/to/boot-media.iso 只是个举例。具体为你的系统盘镜像位置。－m 为虚拟机内存大小，单位是M，默认（不写这个选项）为128M。当然，自己看着给吧。 建议如果虚拟的是xp系统，把页面缓存给关了。老版本的kvm使用-hda xxx.img参数指定镜像，如无法使用-drive，请使用-hda参数，-hda参数不带“file=”)
+ 	kvm -drive file=xxxx.img -cdrom /path/to/boot-media.iso -boot d -m 512
+
+10. 使用虚拟机最简单的命令
+	kvm -m 1024 -drive file=xxx.img
+	或则
+	kvm -m 1024 -drive file=/xxx/xxx/xxx.img 
+
+11 快照模式（-snapshot）(意思是不更改镜像文件，启动后的所有改动均不会往镜像文件上写。临时文件存放在内存中了，具体是cached。 同样的功能，在vbox要独立安装软件。效率可想而知…… 在命令后面空格加上：)
+	-snapshot
+
+12. 高速网络（-net nic,model=virtio -net user）
+	驱动下载地址：
+		http://sourceforge.net/projects/kvm/files/
+	驱动安装命令：
+	kvm -m 1024 -drive file=xp.img -cdrom /home/cat650/linux/kvm/NETKVM-20081229.iso  -enable-kvm -net nic,model=virtio -net user
+
+13. 使用“母镜像”功能(其中xp.img是“母镜像”（参数 -b xxx），xp.test是新镜像——只能用 qcow2 格式。 新镜像的使用：正常使用即可。)
+	kvm-img create -f qcow2  -b xp.img xp.test  或者：kvm-img create -f qcow2 -o backing_file=xp.img xp.test
+
+14. 镜像格式转换，镜像信息查询（能转换的格式有：raw,qcow2,qcow,cow,vmdk,cloop）
+	查询:
+		kvm-img info xxx.img
+	转换命令 （这条命令举例的意思是：把名为xp.img格式为raw的镜像转换成新镜像xp.qco格式为qcow2 其它格式"vmdk"是 VMware 3 / 4 兼容镜像格式。	）：
+		kvm-img convert -f raw -O qcow2 xp.img xp.qco
+
+15. 高速虚拟
+	下载地址：http://www.linux-kvm.org/page/WindowsGuestDrivers/Download_Drivers
+	带图片的参考：http://www.linux-kvm.org/page/WindowsGuestDrivers/viostor/installation
+	命令：把-hda xxx.img 替换为-drive file=/home/cat650/virt/xp.img,if=virtio,boot=on 意思是使用virtio磁盘系统，并作为启动盘（默认是boot=off，作为附加的第二硬盘）。第一次使用的时候记得挂载viostorXXXX.img，来安装驱动。
