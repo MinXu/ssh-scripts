@@ -60,6 +60,7 @@
 	    bridge_maxage 12  
 	    bridge_stp off  
 7. 重新启动网络服务
+    [*****sudo rm  /etc/libvirt/qemu/networks/autostart/default.xml*****]
 	/etc/init.d/networking restart
 
 ===========================================================================================================================
