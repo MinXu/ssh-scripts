@@ -1,3 +1,7 @@
+0. Introduction
+	QEMU Accelerator (KQEMU) is an old driver allowing the QEMU PC emulator to run much faster when emulating a PC on an x86 host. Current versions of qemu (0.11 and up) has no support for kqemu anymore, focusing on kvm instead. The information below is provided for historical reasons only.
+	KQEMU is supported on x86 or x86_64 Linux 2.4 or 2.6 hosts. Experimental versions are available for FreeBSD and Windows NT/2000/2003/XP. 
+
 1. 两个内核模块 
 	1. kvm.ko 2. kvm-intel/kvm-amd; 
 
