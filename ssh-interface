@@ -1,0 +1,21 @@
+#sshpass使用方式很简单，模拟命令行的方式向ssh传递密码
+
+  sshpass -p passwd ssh user@host [some_command]
+
+#-p 参数在命令行直接指定密码
+
+#注意：这是一种最方便的方式，也是一种最不安全的方式，任何人只要执行一个ps就能看到您的密码
+
+  sshpass -f passwd_file ssh user@host [some command]
+
+#此种方式稍微安全一些，从密码文件的第一行读取密码
+
+  SSHPASS=passwd; ssh -e ssh user@host [some command]
+
+#-e 从环境变量读取密码，此种方式的安全性更高了一些
+
+  echo passwd | sshpass -d0 ssh user@host [some command]
+
+#-d 向sshpass传递匿名管道符，sshpass从匿名管道读取密码。此种方式可以达到最大级别的安全性，当然，我上面的例子举的很山寨，直接将标准输入0传给了sshpass
+
+#聪明的你肯定可以想到其他牛逼的方式的（比如，父进程fork出子进程，由子进程执行sshpass，父进程负责传递管道符等等）
